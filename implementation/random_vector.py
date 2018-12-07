@@ -32,8 +32,8 @@ class RandomVector:
 
 
 class PDynamic:
-	def __init__(self, G: MetricTensor, p, iter_fixed_point=7):
-		self.G = G
+	def __init__(self, grad_theta_H, p, iter_fixed_point=7):
+		self.grad_theta_H = grad_theta_H
 		self.p = p
 		self.p_half_leap = None
 		self.iter_fixed_point = iter_fixed_point
@@ -48,15 +48,11 @@ class PDynamic:
 		"""
 		p_half_leap = self.p.copy()
 		p_previous = self.p.copy()
-		if not self.G.sep:
-			G_inv = self.G.value_inv(theta)
-			grad_part = 0.5*(G_inv + G_inv.T)  #Baptiste: Ginv(\theta) est elle sym?
-			for i in range(self.iter_fixed_point):
-				p_half_leap = p_previous - epsilon/2.0*np.dot(grad_part, p_half_leap)
-		else:
-			#TODO:Baptiste je me rappelle plus de notre formule dans ce cas, ca te va si on
-			#TODO:voit ca ensemble la prochaine fois?
-			raise ValueError
+		# if not self.G.sep:
+
+		for i in range(self.iter_fixed_point):
+			grad = self.grad_theta_H(theta, p_half_leap)
+			p_half_leap = p_previous - epsilon/2.0*grad
 
 		self.p_half_leap = p_half_leap
 		return p_half_leap
@@ -71,10 +67,8 @@ class PDynamic:
 		:param epsilon: leapfrog step
 		:return:
 		"""
-		G_inv = self.G.value_inv(theta)
-		grad_part = 0.5 * (G_inv + G_inv.T)  # Baptiste: Ginv(\theta) est elle sym?
-		p_epsilon = self.p_half_leap - epsilon/2.0*np.dot(grad_part, self.p_half_leap)
-
+		grad = self.grad_theta_H(theta, self.p_half_leap)
+		p_epsilon = self.p_half_leap - epsilon/2.0*grad
 		self.p = p_epsilon
 		return p_epsilon
 
