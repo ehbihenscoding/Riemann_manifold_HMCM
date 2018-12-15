@@ -9,12 +9,12 @@ class RandomVector:
 		self.theta = theta
 		self.iter_fixed_point = iter_fixed_point
 
-	def update(self, p, epsilon):
+	def update(self, p_half_leap, epsilon):
 		"""
 		Given a value of p(t+epsilon/2), computes an update of theta
 		Formally, this method returns theta(tau+epsilon) based on its previous value
 
-		:param p: p corresponding to the half leap
+		:param p_half_leap: p corresponding to the half leap
 		:param epsilon:
 		:return:
 		"""
@@ -23,9 +23,9 @@ class RandomVector:
 			for i in range(self.iter_fixed_point):  # 7 itérations mais dans l'article ils parlent de 6 ou 7,
 				# ce paramètre est à faire varier
 				theta_eps = self.theta + epsilon / 2.0 * np.dot(
-					self.G.value_inv(self.theta) + self.G.value_inv(theta_eps), p)
+					self.G.value_inv(self.theta) + self.G.value_inv(theta_eps), p_half_leap)
 		else:
-			theta_eps = self.theta + epsilon * np.dot(self.G.value_inv(self.theta), p)
+			theta_eps = self.theta + epsilon * np.dot(self.G.value_inv(self.theta), p_half_leap)
 
 		self.theta = theta_eps  #TODO:Baptiste tu valides qu'il faille updater l'attribut theta
 		return theta_eps
