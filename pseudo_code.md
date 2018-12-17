@@ -1,4 +1,5 @@
 
+
 - faire une classe pour les priors L(\theta)
 de sorte à ce que l'on ait acces facilement à leur dérivée 
 et à l'expression sous forme analytique
@@ -50,3 +51,41 @@ Assumption \grad log(|X|) = X_inv
 grad_\theta_H = -grad L + 1/2*1/(2pi)*G_inv(\theta)
 
 - Inverse of theta computation:
+
+
+
+---------------------
+# Bayesian Regression
+
+## Computations 
+- G value:
+
+$$G(\theta) = X^T\Gamma X + \alpha^{-1}I$$
+
+
+- G_inv value:
+
+Direct inversion is the best way as resulting matrix is a priori low dimensional
+
+- $\nabla_\theta H$
+
+$(\nabla_\theta H)_i = 
+- \frac{\partial L(\theta)}{\partial \theta_i} 
++ 0.5*tr(G(\theta)^{-1}\frac{\partial G(\theta)}{\partial \theta_i}) 
+- 0.5*p^T G(\theta)^{-1}\frac{\partial G(\theta)}{\partial \theta_i}G(\theta)^{-1} p
+$
+
+1. First term
+
+$\frac{\log p(\theta | y)}{\partial \theta_i} = \frac{\log p(\theta)}{\partial \theta_i} + \frac{\partial \log p(y | \theta)}{\partial \theta_i}$
+
+
+To make things easier, we note $log(A) = (log(a_{ij}))$ or for any function.
+
+We have $log(y|\theta) = y^T \log \sigma(X \theta) + (1 - y)^T log \sigma(-X\theta) $
+
+$\nabla_\theta \log p(y | \theta) = (y - \sigma(X\theta))^TX$
+
+and
+
+2. Other terms are given by the paper

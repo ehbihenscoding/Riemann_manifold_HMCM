@@ -19,15 +19,14 @@ class RandomVector:
 		:return:
 		"""
 		if not self.G.sep:
-			theta_eps = self.theta
-			for i in range(self.iter_fixed_point):  # 7 itérations mais dans l'article ils parlent de 6 ou 7,
-				# ce paramètre est à faire varier
+			theta_eps = self.theta.copy()
+			for i in range(self.iter_fixed_point):
 				theta_eps = self.theta + epsilon / 2.0 * np.dot(
 					self.G.value_inv(self.theta) + self.G.value_inv(theta_eps), p_half_leap)
 		else:
 			theta_eps = self.theta + epsilon * np.dot(self.G.value_inv(self.theta), p_half_leap)
 
-		self.theta = theta_eps  #TODO:Baptiste tu valides qu'il faille updater l'attribut theta
+		self.theta = theta_eps
 		return theta_eps
 
 

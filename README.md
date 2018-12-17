@@ -2,6 +2,11 @@
 
 Implementation of Riemann Manifold Langevin and Hamiltonian Monte Carlo of Girolami and al.
 
+## Installation
+
+`pip install tqdm`
+
+
 ## Code structure
 
 - riemann_hmcmc.py that contains the mass class used for sampling
