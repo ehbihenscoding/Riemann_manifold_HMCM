@@ -16,8 +16,8 @@ epsilon = 1e-1
 sigma = 1.0
 n_leapfrogs = 100
 iter_fixed_point = 4
-n_iter = 500
-n_burn_in = 500
+n_iter = 1000
+n_burn_in = 0
 
 
 # df = pd.read_csv('data/diabetes.csv')
@@ -27,7 +27,7 @@ n_burn_in = 500
 
 X = np.random.randn(100, 2)
 w = np.array([1.0, 2.0])
-z = 1.0 / (1.0 + np.exp(np.dot(X, w)))
+z = 1.0 / (1.0 + np.exp(-np.dot(X, w)))
 y = np.random.random(100) <= z
 y = y.astype(float)
 # plt.scatter(X[:, 0], X[:, 1], c=y.astype(int))
@@ -38,7 +38,7 @@ n_examples, dim = X.shape
 
 metric_tensor = BayesianMetric(alpha=alpha, X=X)
 p0 = 5*np.random.randn(dim)
-theta_0 = 5*np.random.randn(dim)
+theta_0 = np.array([2.0, 1.0]) # 5*np.random.randn(dim)
 
 
 def grad_theta_h(theta, p):
@@ -95,7 +95,18 @@ if __name__ == '__main__':
     sample, acceptance_rates = hmcmc.sample(n_iter=n_iter, n_burn_in=n_burn_in)
     print(acceptance_rates.mean())
 
-    plt.scatter(sample[:, 0], sample[:, 1])
+    plt.scatter(sample[:-10, 0], sample[:-10, 1])
+    plt.scatter(sample[-10:, 0], sample[-10:, 1], c=np.ones(10))
     plt.show()
+
+
+
+# # import time
+# for c, point_sample in enumerate(sample):
+#     # plt.close()
+#     # plt.scatter(point_sample[0], point_sample[1], c=c)
+#     print(point_sample)
+#     # plt.show()
+#     time.sleep(1)
 
 

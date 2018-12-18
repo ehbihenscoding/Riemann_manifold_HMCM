@@ -89,3 +89,16 @@ $\nabla_\theta \log p(y | \theta) = (y - \sigma(X\theta))^TX$
 and
 
 2. Other terms are given by the paper
+
+
+
+----------------------------
+Motivations:
+
+Solve Hamilton-Jacobi equations
+
+H more or less energy.
+
+Resource: Geometric manifold on Riemann manifolds.
+
+We offer proposal and what to determine its performance. Study of diff of theta that depends on M, which we approximate by $G(\theta).$

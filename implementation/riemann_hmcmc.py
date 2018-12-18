@@ -25,6 +25,8 @@ class RiemannHMCMC:
         self.n_leapfrogs = n_leapfrogs
         self.iter_fixed_point = iter_fixed_point
 
+        self.dim = theta_0.shape
+
         # Initialize P and Theta objects
         self.p = PDynamic(grad_theta_H=self.grad_theta_h,
                           p=p0,
@@ -39,13 +41,18 @@ class RiemannHMCMC:
         sample = []
         acceptance_ratios = []
         for id_iter in tqdm(range(n_iter+n_burn_in)):
-
             starting_theta = self.theta.theta
-            starting_p = self.p.p
+
+            # starting_p = self.p.p
+            mean = np.zeros(self.dim)
+            cov = self.riemann_metric.value(starting_theta)
+            starting_p = np.random.multivariate_normal(mean=mean, cov=cov)
 
             theta_eps = None
-            for leap in range(self.n_leapfrogs):
-                direction = 2*int(np.random.random() >= .5) - 1
+            n_leapfrogs = np.random.randint(low=1, high=self.n_leapfrogs+1)
+            for leap in range(n_leapfrogs):
+                # direction = 2*int(np.random.random() >= .5) - 1
+                direction = 1
                 assert np.abs(direction) == 1
                 p_half_leap = self.p.half_leap_update(self.theta.theta,
                                                       epsilon=direction*self.epsilon)
@@ -56,8 +63,9 @@ class RiemannHMCMC:
 
             candidate_theta = self.theta.theta
             candidate_p = self.p.p
+            # print(candidate_p)
             # Acceptation/rejection precedure
-            diff = -self.h(candidate_theta, candidate_p) + self.h(starting_theta, candidate_theta)
+            diff = -self.h(candidate_theta, candidate_p) + self.h(starting_theta, starting_p)
             acceptance_ratio = np.minimum(1.0, np.exp(diff))
             if np.random.random() <= acceptance_ratio:
                 new_theta = candidate_theta
@@ -72,5 +80,5 @@ class RiemannHMCMC:
             acceptance_ratios.append(acceptance_ratio)
 
             if id_iter > n_burn_in:
-                sample.append(theta_eps)
+                sample.append(new_theta)
         return np.array(sample), np.array(acceptance_ratios)
