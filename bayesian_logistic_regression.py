@@ -1,10 +1,10 @@
-import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from implementation.metric_tensor import BayesianMetric
 from implementation.riemann_hmcmc import RiemannHMCMC
+from implementation.vanilla_hmc import VanillaHMC
 
 
 def sigmoid(a):
@@ -13,10 +13,10 @@ def sigmoid(a):
 
 alpha = 100.0
 epsilon = 1e-1
-sigma = 1.0
 n_leapfrogs = 100
-iter_fixed_point = 4
-n_iter = 1000
+iter_fixed_point = 5
+# n_iter = 1000
+n_iter = 100
 n_burn_in = 0
 
 
@@ -38,7 +38,9 @@ n_examples, dim = X.shape
 
 metric_tensor = BayesianMetric(alpha=alpha, X=X)
 p0 = 5*np.random.randn(dim)
-theta_0 = np.array([2.0, 1.0]) # 5*np.random.randn(dim)
+# theta_0 = np.array([2.0, 1.0]) # 5*np.random.randn(dim)
+theta_0 = np.array([10.0, 1.0]) # 5*np.random.randn(dim)
+
 
 
 def grad_theta_h(theta, p):
@@ -89,24 +91,49 @@ def h(theta, p):
 
 
 if __name__ == '__main__':
+    # Riemann Manifold HMC
     hmcmc = RiemannHMCMC(riemann_metric=metric_tensor, h=h, grad_theta_h=grad_theta_h, p0=p0,
                          theta_0=theta_0, epsilon=epsilon, n_leapfrogs=n_leapfrogs,
                          iter_fixed_point=iter_fixed_point)
     sample, acceptance_rates = hmcmc.sample(n_iter=n_iter, n_burn_in=n_burn_in)
+
+    # Vanilla HMC
+    import tensorflow as tf
+    X_tensor = tf.convert_to_tensor(value=X, dtype=tf.float32)
+    y_tensor = tf.convert_to_tensor(value=y, dtype=tf.float32)
+    theta_0_tensor = tf.convert_to_tensor(value=theta_0, dtype=tf.float32)
+
+    def log_posterior(x):
+        x = tf.reshape(x, [-1])
+        # Prior contribution
+        res = -0.5/alpha**2 * tf.reduce_sum(x**2)
+        # y|theta contribution
+        pred = (X_tensor * tf.reshape(x, shape=[1, -1]))
+        pred = tf.reduce_sum(pred, axis=1)
+        res += tf.reduce_sum(y_tensor * tf.log(tf.sigmoid(pred)))
+        res += tf.reduce_sum((1.0 - y_tensor) * tf.log(tf.sigmoid(-pred)))
+        return res
+
+
+    vanilla_hmcmc = VanillaHMC(log_prob=log_posterior,
+                               step_size=epsilon,
+                               num_leapfrog_steps=n_leapfrogs,
+                               theta_0=theta_0_tensor)
+
+    vanilla_sample, vanilla_acceptance_rates = vanilla_hmcmc.sample(n_iter=n_iter,
+
+                                                                    n_burn_in=n_burn_in)
+    sample = np.insert(sample, 0, theta_0, axis=0)
+    vanilla_sample = np.insert(vanilla_sample, 0, theta_0, axis=0)
+    # Plots and prints
     print(acceptance_rates.mean())
-
-    plt.scatter(sample[:-10, 0], sample[:-10, 1])
-    plt.scatter(sample[-10:, 0], sample[-10:, 1], c=np.ones(10))
+    plt.plot(sample[:-10, 0], sample[:-10, 1], 'bx--', label='RHMC')
+    # plt.plot(sample[-10:, 0], sample[-10:, 1], 'x', c=np.ones(10))
+    # plt.show()
+    print(vanilla_acceptance_rates.mean())
+    plt.plot(vanilla_sample[:-10, 0], vanilla_sample[:-10, 1], 'ro--', label='Vanilla HMC')
+    # plt.plot(vanilla_sample[-10:, 0], vanilla_sample[-10:, 1], c=2*np.ones(10))
+    plt.legend()
     plt.show()
-
-
-
-# # import time
-# for c, point_sample in enumerate(sample):
-#     # plt.close()
-#     # plt.scatter(point_sample[0], point_sample[1], c=c)
-#     print(point_sample)
-#     # plt.show()
-#     time.sleep(1)
 
 
