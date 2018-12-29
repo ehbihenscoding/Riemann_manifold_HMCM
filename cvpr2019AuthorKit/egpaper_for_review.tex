@@ -1,57 +1,97 @@
-\documentclass[10pt,twocolumn,letterpaper]{article}
+  \documentclass{beamer}
+  \usepackage[utf8]{inputenc}
+  \usetheme{Pittsburgh}
+ 
+  \usepackage{algorithm}
+  \usepackage{algorithmic}
+  \usepackage{bm}
+  
 
-\usepackage{cvpr}
-\usepackage{times}
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amssymb}
+  \title{Riemann manifold Hamiltonian Monte Carlo methods}
+  \author{Pierre Boyeau \and Baptiste Kerl\'eguer\\}\institute{École Normale Supérieure Paris-Saclay}
+  \date{10 janvier 2018}
 
-% Include other packages here, before hyperref.
+  \begin{document}
 
-% If you comment hyperref and then uncomment it, you should delete
-% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
-% run, let it finish, and you should be clear).
-\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
-
-% \cvprfinalcopy % *** Uncomment this line for the final submission
-
-\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
-\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
-
-% Pages are numbered in submission mode, and unnumbered in camera-ready
-\ifcvprfinal\pagestyle{empty}\fi
-\begin{document}
-
-%%%%%%%%% TITLE
-\title{Implementation of the article \cite{Girolami2011}}
-
-\author{Pierre Boyeau\\
-{\tt\small pierre.boyeau@gmail.com}
-\and
-Baptiste Kerl\'eguer\\
-{\tt\small baptiste.kerleguer@ens-paris-saclay.fr}
+  \begin{frame}
+  \titlepage
+  \end{frame}
+  
+  \begin{frame}{Plan}
+\tableofcontents
+ \end{frame}
+  
+\AtBeginSection[]
+{
+\begin{frame}{Plan}
+\tableofcontents[currentsection]
+ \end{frame}
 }
+  \section{Context}
+  
+  \subsection{Hamiltonian Monte Carlo}
+  \begin{frame}
+  Comme décrit dans \cite{Duane1987}
+  Hamiltonian : $$ H(\bm{\theta},\bm{p}) = -\mathcal{L}(\bm{\theta}) + \frac{1}{2} \log{(2\pi)^2|\bm{M}|} +\frac{1}{2} \bm{p}^T\bm{M}^{-1}\bm{p} \label{Hamiltonian}$$
+  $$ \text{avec } M \text{ une matrice de masse}$$
+  \'Equation d'\'evolution : 
+  \begin{eqnarray}
+  \frac{d\bm{\theta}}{d\tau} = \frac{\partial H}{\partial \bm{p}} \\
+  \frac{d\bm{p}}{d\tau} = -\frac{\partial H}{\partial \bm{\theta}}
+  \label{evolution}
+  \end{eqnarray}  
+  
+  \end{frame}
+  
+  \subsection{Variété Riemannienne}
+  \begin{frame}
+  \cite{Girolami2011} nous décrit les changements à introduire dans le Hamiltinien
+  %M\'etric : $||\bm{v}||_{\bm{M}}^2 = \bm{v}^T \bm{M} \bm{v}$ \\
+  Changement de variation de masse $M$ pour prendre en compte $\bm{\theta}$ $G(\bm{\theta})$. Nous utilisons l'information de Fisher $G(\beta)=\bm{X}^T\bm{\Lambda}\bm{X}+\alpha^{-1}I$ avec $ \beta \sim \mathcal{N}(0,\alpha I) $\\
+  Cependant cela induit le calcule de $G(\bm{\theta})^{-1}$ car les équations deviennent:
+  \begin{eqnarray}
+  \frac{d\bm{\theta}}{d\tau} = G(\bm{\theta})^{-1}\bm{p} \\
+  \frac{d\bm{p}}{d\tau} = \nabla_\theta\mathcal{L}(\bm{\theta})-\frac{1}{2}\text{tr}\left(G(\bm{\theta})^{-1}\frac{\partial G(\bm{\theta})}{\partial \bm{\theta}} \right)+\frac{1}{2}\bm{p}^T(\bm{\theta})^{-1}\frac{\partial G(\bm{\theta})}{\partial \bm{\theta}}(\bm{\theta})^{-1}\bm{p}
+  \label{evolution}
+  \end{eqnarray} 
+  
+  \end{frame}
+  
+  \subsection{Riemann Manifold Hamiltonian Monte Carlo}
+  \begin{frame}
+  
 
-\maketitle
-%\thispagestyle{empty}
+\begin{algorithmic}
+\REQUIRE $G(0)$ $-\mathcal{L}(\theta)$ $p^0$ $\theta^0$
+%\ENSURE 
+\FOR{$i = 0:N-1$}
+\STATE sample $p^{i+1}$ selon $\mathcal{N}(O,G^i)$
+\FOR{$j = 1 : Nb_{leapfrogs}$}
+\STATE $p_{tempo}=p_\tau$
+\FOR{$k = 1 : N_{pointfixe}$}
+\STATE $p\left(\tau +\frac{\epsilon}{2}\right)=p\left(\tau\right)-\frac{\epsilon}{2}\nabla_\theta H\left(\theta(\tau),p_{tempo}\right)$
+\ENDFOR
+\STATE $p\left(\tau +\frac{\epsilon}{2}\right) =p_{tempo}$
+\STATE $\theta_{tempo}=\theta(\tau)$
+\FOR{$k = 1 : N_{pointfixe}$}
+\STATE $\theta(\tau +\epsilon)=\theta(\tau)+\frac{\epsilon}{2}\left[G^{-1}\left(\theta(\tau)\right)+G^{-1}\left(\theta_{tempo}\right)\right]p\left(\tau+\frac{\epsilon}{2}\right)$
+\ENDFOR
+\STATE $\theta(\tau+\epsilon)=\theta_{tempo}$
+\STATE $p(\tau+\epsilon)=p\left(\tau+\frac{\epsilon}{2}\right)-\frac{\epsilon}{2}\nabla_\theta H\left(\theta\left(\tau+\frac{\epsilon}{2}\right),p\left(\tau+\frac{\epsilon}{2}\right)\right)$
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
 
-%%%%%%%%% ABSTRACT
-\begin{abstract}
-On va avoir une super note!!!
-\end{abstract}
+  \end{frame}
+  
+  \section{Implementation}
+  \begin{frame}
+  
+  \end{frame}
 
-%%%%%%%%% BODY TEXT
-\section{Introduction}
-Je pensais faire ici une explication de l'algorithme.\\
-Je pense qu'il faudra faire une beamer qui est plus adapté pour la présentation mais là on est sur un document de travail. Tu peux ajouter du code. 
-\section{Impl\'ementation}
-Ici l'explication de notre impl\'ementation. ?? Il serait cool d'avoir de vrai données expérimentales ca te dit d'aller les chercher ici \url{https://population.un.org/wpp/Download/Standard/Population/} (Baptiste) ??
-\section{Resultats}
-Titre explicite non?
-{\small
-\bibliographystyle{ieee}
-\bibliography{egbib}
-}
+  \begin{frame}
+  \bibliographystyle{ieee}
+  \bibliography{egbib}
+  \end{frame}
 
-\end{document}
+  \end{document}
