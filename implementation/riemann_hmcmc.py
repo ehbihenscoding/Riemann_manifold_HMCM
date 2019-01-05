@@ -47,6 +47,7 @@ class RiemannHMCMC:
             mean = np.zeros(self.dim)
             cov = self.riemann_metric.value(starting_theta)
             starting_p = np.random.multivariate_normal(mean=mean, cov=cov)
+            self.p.p = starting_p
 
             theta_eps = None
             n_leapfrogs = np.random.randint(low=1, high=self.n_leapfrogs+1)
@@ -69,13 +70,15 @@ class RiemannHMCMC:
             acceptance_ratio = np.minimum(1.0, np.exp(diff))
             if np.random.random() <= acceptance_ratio:
                 new_theta = candidate_theta
-                new_p = candidate_p
+
+                # new_p = candidate_p
                 # No need to change theta and p objects in this case
             else:
                 new_theta = starting_theta
-                new_p = starting_p
                 self.theta.theta = new_theta
-                self.p.p = new_p
+
+                # new_p = starting_p
+                # self.p.p = new_p
 
             acceptance_ratios.append(acceptance_ratio)
 

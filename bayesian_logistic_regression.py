@@ -15,8 +15,8 @@ alpha = 100.0
 epsilon = 1e-1
 n_leapfrogs = 100
 iter_fixed_point = 5
-# n_iter = 1000
-n_iter = 100
+n_iter = 1000
+# n_iter = 100
 n_burn_in = 0
 
 
@@ -25,11 +25,22 @@ n_burn_in = 0
 # y = df.Outcome.values
 # X = df.drop(columns='Outcome').values
 
-X = np.random.randn(100, 2)
-w = np.array([1.0, 2.0])
+# 1D Version
+X = np.random.randn(100, 1)
+w = np.array([2.0])
 z = 1.0 / (1.0 + np.exp(-np.dot(X, w)))
 y = np.random.random(100) <= z
 y = y.astype(float)
+theta_0 = np.array([-100.0])
+
+# 2D Version
+# X = np.random.randn(100, 2)
+# w = np.array([1.0, 2.0])
+# z = 1.0 / (1.0 + np.exp(-np.dot(X, w)))
+# y = np.random.random(100) <= z
+# y = y.astype(float)
+# theta_0 = np.array([10.0, 1.0])
+
 # plt.scatter(X[:, 0], X[:, 1], c=y.astype(int))
 # plt.show()
 
@@ -38,9 +49,6 @@ n_examples, dim = X.shape
 
 metric_tensor = BayesianMetric(alpha=alpha, X=X)
 p0 = 5*np.random.randn(dim)
-# theta_0 = np.array([2.0, 1.0]) # 5*np.random.randn(dim)
-theta_0 = np.array([10.0, 1.0]) # 5*np.random.randn(dim)
-
 
 
 def grad_theta_h(theta, p):
@@ -116,24 +124,50 @@ if __name__ == '__main__':
 
 
     vanilla_hmcmc = VanillaHMC(log_prob=log_posterior,
-                               step_size=epsilon,
+                               step_size=1.0,
                                num_leapfrog_steps=n_leapfrogs,
                                theta_0=theta_0_tensor)
 
     vanilla_sample, vanilla_acceptance_rates = vanilla_hmcmc.sample(n_iter=n_iter,
-
                                                                     n_burn_in=n_burn_in)
+
     sample = np.insert(sample, 0, theta_0, axis=0)
     vanilla_sample = np.insert(vanilla_sample, 0, theta_0, axis=0)
-    # Plots and prints
-    print(acceptance_rates.mean())
-    plt.plot(sample[:-10, 0], sample[:-10, 1], 'bx--', label='RHMC')
-    # plt.plot(sample[-10:, 0], sample[-10:, 1], 'x', c=np.ones(10))
-    # plt.show()
-    print(vanilla_acceptance_rates.mean())
-    plt.plot(vanilla_sample[:-10, 0], vanilla_sample[:-10, 1], 'ro--', label='Vanilla HMC')
-    # plt.plot(vanilla_sample[-10:, 0], vanilla_sample[-10:, 1], c=2*np.ones(10))
+
+
+    # 1D plot
+    from utils import autocorr_function
+
+    lags, autocorrs = autocorr_function(sample)
+    _, vanilla_autocorrs = autocorr_function(vanilla_sample)
+
+    plt.plot(lags, autocorrs, label='RHMC')
+    plt.plot(lags, vanilla_autocorrs, label='Vanilla')
     plt.legend()
     plt.show()
+
+    # 2D plots
+    # Plots and prints
+    # print(acceptance_rates.mean())
+    # plt.plot(sample[:-10, 0], sample[:-10, 1], 'bx--', label='RHMC')
+    # # plt.plot(sample[-10:, 0], sample[-10:, 1], 'x', c=np.ones(10))
+    # # plt.show()
+    # print(vanilla_acceptance_rates.mean())
+    # plt.plot(vanilla_sample[:-10, 0], vanilla_sample[:-10, 1], 'ro--', label='Vanilla HMC')
+    # # plt.plot(vanilla_sample[-10:, 0], vanilla_sample[-10:, 1], c=2*np.ones(10))
+    # plt.legend()
+    # plt.show()
+
+    # plt.scatter(sample[100:-10, 0],
+    #             sample[100:-10, 1], label='RHMC')
+    # plt.legend()
+    # plt.show()
+    # #
+    # plt.scatter(vanilla_sample[100:-10, 0],
+    #             vanilla_sample[100:-10, 1], label='Vanilla')
+    # plt.legend()
+    # plt.show()
+
+
 
 
