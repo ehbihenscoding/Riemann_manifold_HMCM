@@ -29,10 +29,12 @@
 }
   \section{Context}
   
-  \subsection{Hamiltonian Monte Carlo}
-  \begin{frame}
-  Comme décrit dans \cite{Duane1987}
-  Hamiltonian : $$ H(\bm{\theta},\bm{p}) = -\mathcal{L}(\bm{\theta}) + \frac{1}{2} \log{(2\pi)^2|\bm{M}|} +\frac{1}{2} \bm{p}^T\bm{M}^{-1}\bm{p} \label{Hamiltonian}$$
+  \subsection{Hamiltonian Monte Carlo}  
+  \begin{frame}{Hamiltonian Monte Carlo Classique}
+  \underline{Idée}: Introduction d'une variable auxiliaire $\bm{p}$: 
+  
+  
+  Log-proba négative cible: Hamiltonien: $$ H(\bm{\theta},\bm{p}) = -\mathcal{L}(\bm{\theta}) + \frac{1}{2} \log{(2\pi)^2|\bm{M}|} +\frac{1}{2} \bm{p}^T\bm{M}^{-1}\bm{p} \label{Hamiltonian}$$
   $$ \text{avec } M \text{ une matrice de masse}$$
   \'Equation d'\'evolution : 
   \begin{eqnarray}
@@ -44,21 +46,33 @@
   \end{frame}
   
   \subsection{Variété Riemannienne}
-  \begin{frame}
-  \cite{Girolami2011} nous décrit les changements à introduire dans le Hamiltinien
-  %M\'etric : $||\bm{v}||_{\bm{M}}^2 = \bm{v}^T \bm{M} \bm{v}$ \\
-  Changement de variation de masse $M$ pour prendre en compte $\bm{\theta}$ $G(\bm{\theta})$. Nous utilisons l'information de Fisher $G(\beta)=\bm{X}^T\bm{\Lambda}\bm{X}+\alpha^{-1}I$ avec $ \beta \sim \mathcal{N}(0,\alpha I) $\\
-  Cependant cela induit le calcule de $G(\bm{\theta})^{-1}$ car les équations deviennent:
+  \begin{frame}{Variété Riemannienne}
+  \underline{Idée}: Prendre en compte des arguments de géométrie Riemannienne pour \textit{sampler} $p$:
+  $M \rightarrow \bm{\theta}$ $G(\bm{\theta})$.\\
+  Nouvelle équation d'évolution:
   \begin{eqnarray}
   \frac{d\bm{\theta}}{d\tau} = G(\bm{\theta})^{-1}\bm{p} \\
   \frac{d\bm{p}}{d\tau} = \nabla_\theta\mathcal{L}(\bm{\theta})-\frac{1}{2}\text{tr}\left(G(\bm{\theta})^{-1}\frac{\partial G(\bm{\theta})}{\partial \bm{\theta}} \right)+\frac{1}{2}\bm{p}^T(\bm{\theta})^{-1}\frac{\partial G(\bm{\theta})}{\partial \bm{\theta}}(\bm{\theta})^{-1}\bm{p}
   \label{evolution}
-  \end{eqnarray} 
-  
+  \end{eqnarray}
+  $\Rightarrow$ Calcul de $G(\bm{\theta})^{-1}$ nécessaire.
   \end{frame}
   
+  \begin{frame}{Choix de $G(\bm{\theta})$}
+  
+  \end{frame}
+
+  
+  
   \subsection{Riemann Manifold Hamiltonian Monte Carlo}
-  \begin{frame}
+  
+  
+  \begin{frame}{Intégrateur de Verlet}
+	Mise en place	
+	
+  \end{frame}	  
+  
+  \begin{frame}{Algorithme}
   
 
 \begin{algorithmic}
@@ -84,11 +98,11 @@
 
   \end{frame}
   
-  \section{Implementation}
-  \begin{frame}
-  
+  \section{Application: Régression Logistique Bayésienne}
+  \begin{frame}{Régression Logistique Bayésienne}
+  	Nous utilisons l'information de Fisher $G(\beta)=\bm{X}^T\bm{\Lambda}\bm{X}+\alpha^{-1}I$ avec $ \beta \sim \mathcal{N}(0,\alpha I) $
   \end{frame}
-
+	
   \begin{frame}
   \bibliographystyle{ieee}
   \bibliography{egbib}
