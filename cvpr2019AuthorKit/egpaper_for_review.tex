@@ -66,11 +66,26 @@
   
   \subsection{Riemann Manifold Hamiltonian Monte Carlo}
   
+  \begin{frame}{RMHMC}
+  On suppose qu'on a $\bm{\theta}_n$. Gibbs sampling:
+  \begin{enumerate}
+    \item Sampler $\bm{p}_{n+1}|\bm{\theta_n} \sim \mathcal{N}(0, G(\bm{\theta}_n))$
+    \item Le \textit{proposal} $(\bm{\theta}_{*}, \bm{p}_*)$ est obtenu à l'aide de l'intégrateur de Verlet.
+    
+    $\bm{\theta}_{*}$ accepté avec probabilité: 
+    \begin{align*}
+    min(1, \exp[H(\bm{\theta}_n, \bm{p}_{n+1}) 
+    - H(\bm{\theta}_*, \bm{p}_*)])
+    \end{align*}
+    \underline{Interprétation et remarques}
+  \end{enumerate}
+  \end{frame}  
   
   \begin{frame}{Intégrateur de Verlet}
 	Mise en place	
 	
   \end{frame}	  
+      
   
   \begin{frame}{Algorithme}
   
@@ -100,9 +115,30 @@
   
   \section{Application: Régression Logistique Bayésienne}
   \begin{frame}{Régression Logistique Bayésienne}
-  	Nous utilisons l'information de Fisher $G(\beta)=\bm{X}^T\bm{\Lambda}\bm{X}+\alpha^{-1}I$ avec $ \beta \sim \mathcal{N}(0,\alpha I) $
+	\underline{Modèle}: 
+	\begin{enumerate}
+	\item Prior gaussien: $ \beta \sim \mathcal{N}(0,\alpha I) $
+	\item Loi $Y|\beta$: modèle de régression logistique classique
+\end{enumerate}	  
+  
+  	Tenseur métrique choisi: information de Fisher $G(\beta)=\bm{X}^T\bm{\Lambda}\bm{X}+\alpha^{-1}I$
+  	
+  	\underline{Travail réalisé}: Etude comparée de RMHMC et de HMC sur cette tâche et sur données simulées.
   \end{frame}
-	
+
+
+\begin{frame}{Performances}
+
+\end{frame}
+
+
+\begin{frame}{Difficultés rencontrées}
+
+\end{frame}
+
+\begin{frame}{Conclusion sur RMHMC}
+
+\end{frame}
   \begin{frame}
   \bibliographystyle{ieee}
   \bibliography{egbib}
