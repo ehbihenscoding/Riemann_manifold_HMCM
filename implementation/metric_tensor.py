@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.special import expit as sigmo
 
 class MetricTensor:
     def __init__(self, sep):
@@ -101,3 +101,56 @@ class BayesianMetric(MetricTensor):
     @staticmethod
     def logistic_fn(x):
         return 1.0 / (1.0 + np.exp(-x))
+
+
+class BayesianEmpiricalMetric(MetricTensor):
+    def __init__(self, X, y):
+        super(BayesianEmpiricalMetric, self).__init__(sep=False)
+        self.X = X
+        self.y = y
+        self.dim = self.X.shape[1]
+
+    def value(self, theta):
+        pred = np.dot(self.X, theta)
+        G = self.y*(1 - self.logistic_fn(pred))
+        G -= (1 - self.y)*(1 - self.logistic_fn(-pred))
+        G = G.reshape((len(self.X), 1))
+        G = G*self.X
+        # print('value: ', np.cov(G.T))
+        return np.cov(G.T)
+
+    def value_inv(self, theta):
+        G = self.value(theta)  # d*d matrix inversion
+        # print('value inv: ', np.linalg.pinv(G))
+        return np.linalg.pinv(G)
+
+    def derivative(self, theta):
+        pred = np.dot(self.X, theta)
+        sigm_pred = self.logistic_fn(pred)
+
+        # res = (1 - 2*self.y).reshape((-1, 1, 1, 1))
+        # res = res*self.X.reshape((-1, 1, 1, self.dim))
+        # res = res*(sigm_pred*(1.0-sigm_pred)).reshape((-1, 1, 1, 1))
+        # res = res*(sigm_pred*(1.0 - 2*self.y) + 1).reshape((-1, 1, 1, 1))
+        # cov_term = self.X.reshape((-1, 1, self.dim))*self.X.reshape((-1, self.dim, 1))
+        # res = res*cov_term.reshape((-1, self.dim, self.dim, 1))
+        # res = res.mean(axis=0)
+        # res = 2.0*res
+
+        res = -self.X.reshape((-1, 1, 1, self.dim))
+        res = res*(sigm_pred*(1.0-sigm_pred)).reshape((-1, 1, 1, 1))
+        res = res*(2*self.y - 1 - sigm_pred).reshape((-1, 1, 1, 1))
+        cov_term = self.X.reshape((-1, 1, self.dim))*self.X.reshape((-1, self.dim, 1))
+        res = res*cov_term.reshape((-1, self.dim, self.dim, 1))
+        res = res.mean(axis=0)
+        res = 2.0*res
+
+        return res
+
+    @staticmethod
+    def logistic_fn(x):
+        return sigmo(x)
+        # if -x > np.log(np.finfo(type(x)).max):
+        #     return 0.0
+        # return 1.0 / (1.0 + np.exp(-x))
+

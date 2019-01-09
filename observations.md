@@ -27,3 +27,8 @@ En pratique: ces articles font le choix d'acceptance rates très élevés
 https://arxiv.org/pdf/1407.1517.pdf
 https://arxiv.org/pdf/1212.4693.pdf
 
+
+- ESS Données simulées 100 vs 100 leapfrogs
+[ 857.94969977 1000.        ]
+[1001.      309.2979]
+

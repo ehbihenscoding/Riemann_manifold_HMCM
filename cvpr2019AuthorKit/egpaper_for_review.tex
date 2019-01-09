@@ -59,12 +59,21 @@
   \end{frame}
   
   \begin{frame}{Choix de $G(\bm{\theta})$}
+	Prise en compte de la réalité géométrique locale
+	
+	\begin{itemize}
+	\item Espérance de l'information de Fisher
+	\item Observation de l'information de Fisher observée
+	\item Information de Fisher empirique
+	\item Autres tenseurs
+	\end{itemize}
+		
+	  
+%  Notre choix de $G(\theta)$ en consid\'erant le problème actuel 
+%  $$ G(\beta) = \bm{X}^T\bm{\Lambda X} +\alpha^{-1}\bm{I} $$
   
-  Notre choix de $G(\theta)$ en consid\'erant le problème actuel 
-  $$ G(\beta) = \bm{X}^T\bm{\Lambda X} +\alpha^{-1}\bm{I} $$
-  
-  Pour obtenir une variété de courbure constante:
-  $$ G=\bm{X}^T\bm{X}+\alpha^{-1}\bm{I} $$
+%  Pour obtenir une variété de courbure constante:
+%  $$ G=\bm{X}^T\bm{X}+\alpha^{-1}\bm{I} $$
   
   \end{frame}
 
@@ -88,8 +97,23 @@
   \end{frame}  
   
   \begin{frame}{Intégrateur de Verlet}
-	Mise en place	
+	Pour assurer un MCMC correct, l'intégration des équations de trajectoire doit être	
+	\begin{itemize}
+	\item Réversible
+	\item Préservation du volume
+	\end{itemize}
 	
+	\begin{align*}
+p\left(\tau +\frac{\epsilon}{2}\right)=p\left(\tau\right)-\frac{\epsilon}{2}\nabla_\theta H\left(\theta(\tau\right),p\left(\tau +\frac{\epsilon}{2}\right) \\
+\theta(\tau +\epsilon)=\theta(\tau)\\
++\frac{\epsilon}{2}\left[	\nabla_p H\left(\theta\left(\tau\right),p\left(\tau+\frac{\epsilon}{2}\right)\right)+ \nabla_p H\left(\theta\left(\tau+\epsilon\right), p\left(\tau+\frac{\epsilon}{2}\right)\right)\right]\\
+p(\tau+\epsilon)=p\left(\tau+\frac{\epsilon}{2}\right)-\frac{\epsilon}{2}\nabla_\theta H\left(\theta\left(\tau+\frac{\epsilon}{2}\right),p\left(\tau+\frac{\epsilon}{2}\right)\right)
+	\end{align*}
+	
+	\begin{align*}
+	\end{align*}
+	
+	\underline{Difficultés soulevées}
   \end{frame}	  
       
   
@@ -132,22 +156,51 @@
   	\underline{Travail réalisé}: Etude comparée de RMHMC et de HMC sur cette tâche et sur données simulées.
   \end{frame}
 
+\subsection{Validation de l'algorithme}
+\begin{frame}{Validation de l'algorithme}
+   \begin{figure}
+   \includegraphics[scale=0.4]{figs/posterior_comparison_100_vs_100.png}
+   \end{figure}
+\end{frame}
+
+\subsection{Performances sur données simulées}
+\begin{frame}{Performances}
+	\begin{figure}
+	\includegraphics[scale=0.4]{figs/conv_2d_6leaps_vs_100.png}
+	\end{figure}
+\end{frame}
 
 \begin{frame}{Performances}
-
+	\begin{figure}
+	\includegraphics[scale=0.4]{figs/autocorr_mean_100_100.png}
+	\end{figure}
 \end{frame}
 
-
-\begin{frame}{Difficultés rencontrées}
-
+\subsection{Performances sur données réelles}
+\begin{frame}{Données réelles}
+   \begin{figure}
+   \includegraphics[scale=0.4]{figs/autocorr_real_6_vs_100.png}
+   \end{figure}
 \end{frame}
 
-\begin{frame}{Conclusion sur RMHMC}
+\section{Limites et ouvertures}
+\begin{frame}{Limites et ouvertures}
+\underline{Limites:}
+\begin{itemize}
+\item Coût computationnel important
+\end{itemize}
 
+\underline{Ouverture}
+\begin{itemize}
+\item Acceptance ratio
+\item Choix de $G(\theta)$
+\end{itemize}
 \end{frame}
+
   \begin{frame}
   \bibliographystyle{ieee}
   \bibliography{egbib}
   \end{frame}
+ 
 
   \end{document}
