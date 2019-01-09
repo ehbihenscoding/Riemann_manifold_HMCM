@@ -121,7 +121,7 @@ p(\tau+\epsilon)=p\left(\tau+\frac{\epsilon}{2}\right)-\frac{\epsilon}{2}\nabla_
   
 
 \begin{algorithmic}
-\REQUIRE $G(0)$ $-\mathcal{L}(\theta)$ $p^0$ $\theta^0$
+\REQUIRE $G(0)$ $-\mathcal{L}(\theta)$ $\theta^0$
 %\ENSURE 
 \FOR{$i = 0:N-1$}
 \STATE sample $p^{i+1}$ selon $\mathcal{N}(O,G^i)$
@@ -188,6 +188,7 @@ p(\tau+\epsilon)=p\left(\tau+\frac{\epsilon}{2}\right)-\frac{\epsilon}{2}\nabla_
 \underline{Limites:}
 \begin{itemize}
 \item Coût computationnel important
+\item Temps à passer à chercher les hyperparamètres (HMC) devient un temps d'implémentation (RMHMC)
 \end{itemize}
 
 \underline{Ouverture}
@@ -198,7 +199,7 @@ p(\tau+\epsilon)=p\left(\tau+\frac{\epsilon}{2}\right)-\frac{\epsilon}{2}\nabla_
 \end{frame}
 
   \begin{frame}
-  \bibliographystyle{ieee}
+  \bibliographystyle{plan}
   \bibliography{egbib}
   \end{frame}
  

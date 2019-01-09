@@ -1,13 +1,3 @@
-\begin{thebibliography}{1}\itemsep=-1pt
-
-\bibitem{Duane1987}
-S.~Duane, A.~D. Kennedy, B.~J. Pendleton, and D.~Roweth.
-\newblock {Hybird Monte Carlo}.
-\newblock {\em Physics Letters B}, 195(2):216--222, 1987.
-
-\bibitem{Girolami2011}
-M.~Girolami and B.~Calderhead.
-\newblock {Riemann manifold Langevin and Hamiltonian Monte Carlo methods}.
-\newblock {\em The Royal Statistical Society}, 73(1):1--37, 2011.
+\begin{thebibliography}{}\itemsep=-1pt
 
 \end{thebibliography}
